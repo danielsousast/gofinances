@@ -10,6 +10,14 @@ export default {
     shape: "#ffffff",
     title: "#363f5f",
     text: "#969cb2",
+    text_dark: "#000000",
     background: "#f0f2f5",
+    separator: "#dbdbdb",
+  },
+
+  fonts: {
+    regular: "Poppins_400Regular",
+    medium: "Poppins_500Medium",
+    bold: "Poppins_700Bold",
   },
 };
