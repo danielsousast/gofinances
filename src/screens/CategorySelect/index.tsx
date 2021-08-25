@@ -1,4 +1,5 @@
 import React from "react";
+
 import Button from "../../components/Forms/Button";
 import { categories } from "../../utils/categories";
 import {
@@ -33,6 +34,7 @@ const CategorySelect: React.FC<ComponentProps> = ({
   const handleCategoryPress = (item: Category) => {
     setCategory(item);
   };
+
   const renderCategoryItem = ({ item }: { item: Category }) => (
     <CategoryContainer
       onPress={() => handleCategoryPress(item)}

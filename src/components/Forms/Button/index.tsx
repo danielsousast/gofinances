@@ -7,7 +7,7 @@ interface ComponentProps extends RectButtonProps {
   onPress: () => void;
 }
 
-const Button: React.FC<ComponentProps> = ({ title, onPress, ...rest }) => {
+const Button: React.FC<ComponentProps> = ({ title, onPress }) => {
   return (
     <Container onPress={onPress}>
       <Title>{title}</Title>

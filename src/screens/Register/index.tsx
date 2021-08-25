@@ -3,22 +3,20 @@ import { Keyboard, Modal, TouchableWithoutFeedback, Alert } from "react-native";
 import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
+import uuid from "react-native-uuid";
 
 import Button from "../../components/Forms/Button";
 import CategorySelectButton from "../../components/Forms/CategorySelectButton";
 import InputForm from "../../components/Forms/InputForm";
 import TransactionTypeButton from "../../components/Forms/TransactionTypeButton";
 import CategorySelect from "../CategorySelect";
-import {
-  Container,
-  Fields,
-  FieldsContainer,
-  Form,
-  Header,
-  Title,
-} from "./styles";
+import { Container, Fields, FieldsContainer, Form } from "./styles";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation } from "@react-navigation/native";
+import { dataKey } from "../../utils/asyncstorage";
+import Header from "../../components/Header";
 
-type TransactionType = "up" | "down";
+type TransactionType = "positive" | "negative";
 
 interface FormData {
   name: string;
@@ -43,10 +41,13 @@ const Register: React.FC = () => {
     icon: "any",
   });
 
+  const { navigate } = useNavigation();
+
   const {
     control,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm({
     resolver: yupResolver(schema),
   });
@@ -63,7 +64,17 @@ const Register: React.FC = () => {
     setCategoryModalOpen(true);
   };
 
-  const handleRegister = (form: FormData) => {
+  function resetFields() {
+    reset();
+    setTransactionType("");
+    setCategory({
+      key: "category",
+      name: "Categoria",
+      icon: "any",
+    });
+  }
+
+  async function handleRegister(form: FormData) {
     if (!transactionType) {
       return Alert.alert("Selecione o tipo da transacao");
     }
@@ -72,22 +83,35 @@ const Register: React.FC = () => {
       return Alert.alert("Selecione a categria");
     }
 
-    const data = {
+    const newTransaction = {
+      id: String(uuid.v4()),
       name: form.name,
       amount: form.amount,
-      transactionType,
+      type: transactionType,
       category: category.key,
+      date: new Date(),
     };
 
-    console.log(data);
-  };
+    try {
+      const response = await AsyncStorage.getItem(dataKey);
+      const currentData = response ? JSON.parse(response) : [];
+
+      const dataFormatted = [...currentData, newTransaction];
+
+      await AsyncStorage.setItem(dataKey, JSON.stringify(dataFormatted));
+
+      resetFields();
+
+      navigate("Listagem");
+    } catch (error) {
+      Alert.alert("Nao foi possivel salvar");
+    }
+  }
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <Container>
-        <Header>
-          <Title>Cadastro</Title>
-        </Header>
+        <Header title="Cadastro" />
         <Form>
           <Fields>
             <InputForm
@@ -110,13 +134,13 @@ const Register: React.FC = () => {
                 active={transactionType === "up"}
                 type="up"
                 title="Entradas"
-                onPress={() => handleTransactionTypeSelect("up")}
+                onPress={() => handleTransactionTypeSelect("positive")}
               />
               <TransactionTypeButton
-                active={transactionType === "down"}
+                active={transactionType === "negative"}
                 type="down"
                 title="Saidas"
-                onPress={() => handleTransactionTypeSelect("down")}
+                onPress={() => handleTransactionTypeSelect("negative")}
               />
             </FieldsContainer>
             <CategorySelectButton
