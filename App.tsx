@@ -5,7 +5,8 @@ import "intl/locale-data/jsonp/pt-BR";
 import React from "react";
 import { StatusBar } from "react-native";
 import { ThemeProvider } from "styled-components";
-
+import { NavigationContainer } from "@react-navigation/native";
+import AppLoading from "expo-app-loading";
 import {
   useFonts,
   Poppins_400Regular,
@@ -14,10 +15,9 @@ import {
 } from "@expo-google-fonts/poppins";
 
 import theme from "./src/global/styles/theme";
-
-import AppLoading from "expo-app-loading";
-import { NavigationContainer } from "@react-navigation/native";
 import AppRoutes from "./src/routes/app.routes";
+import SignIn from "./src/screens/SignIn";
+import { AuthProvider } from "./src/context/AuthContext";
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -38,7 +38,9 @@ export default function App() {
           backgroundColor={theme.colors.primary}
         />
         <NavigationContainer>
-          <AppRoutes />
+          <AuthProvider value={[]}>
+            <SignIn />
+          </AuthProvider>
         </NavigationContainer>
       </>
     </ThemeProvider>

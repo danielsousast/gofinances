@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { VictoryPie } from "victory-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
 
@@ -7,7 +8,7 @@ import Header from "../../components/Header";
 import ResumeItem from "../../components/ResumeItem";
 import { dataKey } from "../../utils/asyncstorage";
 import { categories } from "../../utils/categories";
-import { Container, Content } from "./styles";
+import { Container, Content, LoadingContainer } from "./styles";
 
 interface Transaction {
   id: string;

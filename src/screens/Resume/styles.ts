@@ -8,3 +8,10 @@ export const Container = styled.View`
 export const Content = styled.ScrollView.attrs({
   contentContainerStyle: { padding: 24, flex: 1 },
 })``;
+
+export const LoadingContainer = styled.View`
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  background-color: ${({ theme }) => theme.colors.shape};
+`;
