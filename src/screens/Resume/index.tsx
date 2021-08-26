@@ -9,6 +9,7 @@ import ResumeItem from "../../components/ResumeItem";
 import { dataKey } from "../../utils/asyncstorage";
 import { categories } from "../../utils/categories";
 import { Container, Content, LoadingContainer } from "./styles";
+import { useAuth } from "../../context/AuthContext";
 
 interface Transaction {
   id: string;
@@ -27,12 +28,13 @@ interface Category {
 }
 
 const Resume: React.FC = () => {
+  const { user } = useAuth();
   const [categoriesTotal, setCategoriesTotal] = useState<Category[]>(
     [] as Category[]
   );
 
   async function loadTransactions() {
-    const response = await AsyncStorage.getItem(dataKey);
+    const response = await AsyncStorage.getItem(`${dataKey}:${user.email}`);
     const responseFormatted = response ? JSON.parse(response) : [];
 
     const expensives = responseFormatted.filter(

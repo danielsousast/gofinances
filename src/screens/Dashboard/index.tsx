@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { ActivityIndicator } from "react-native";
 import { useCallback } from "react";
 import { useFocusEffect } from "@react-navigation/native";
+import { useTheme } from "styled-components/native";
+import { useAuth } from "../../context/AuthContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import PrimaryCard from "../../components/PrimaryCard";
@@ -28,7 +30,6 @@ import {
   TransactionsList,
   LoadingContainer,
 } from "./styles";
-import { useTheme } from "styled-components/native";
 
 interface BalanceProps {
   amount: string;
@@ -51,15 +52,23 @@ const Dashboard: React.FC = () => {
   const [balance, setBalance] = useState<Balance>({} as Balance);
   const theme = useTheme();
 
+  const { signOut, user } = useAuth();
+
   function getLastTransacrions({ collection, type }: GetLastTransaction) {
+    const collectionFilttered = collection.filter(
+      (transaction: TransactionsProps) => transaction.type === type
+    );
+
+    if (collectionFilttered.length === 0) {
+      return 0;
+    }
+
     const lastTransaction = new Date(
       Math.max.apply(
         Math,
-        collection
-          .filter((transaction: TransactionsProps) => transaction.type === type)
-          .map((transaction: TransactionsProps) =>
-            new Date(transaction.date).getTime()
-          )
+        collectionFilttered.map((transaction: TransactionsProps) =>
+          new Date(transaction.date).getTime()
+        )
       )
     );
 
@@ -74,7 +83,7 @@ const Dashboard: React.FC = () => {
   }
 
   async function loadTransactions() {
-    const response = await AsyncStorage.getItem(dataKey);
+    const response = await AsyncStorage.getItem(`${dataKey}:${user.email}`);
 
     const transactionsReponse = response ? JSON.parse(response) : [];
 
@@ -123,9 +132,7 @@ const Dashboard: React.FC = () => {
       type: "negative",
     });
 
-    const totalInterval = `01 a ${lastExpensive}`;
-
-    console.log(lastExpensive);
+    const totalInterval = lastExpensive === 0 ? "" : `01 a ${lastExpensive}`;
 
     const total = entriesTotal - expensiveTotal;
 
@@ -154,6 +161,8 @@ const Dashboard: React.FC = () => {
       },
     });
     setTransactions(transactionsFormatted);
+
+    console.log(transactions);
     setIsLoading(false);
   }
 
@@ -176,16 +185,16 @@ const Dashboard: React.FC = () => {
               <UserInfo>
                 <Photo
                   source={{
-                    uri: "https://avatars.githubusercontent.com/u/15719314?v=4",
+                    uri: user.photo,
                   }}
                 />
 
                 <User>
                   <UserGreeting>Ola,</UserGreeting>
-                  <UserName>Daniel</UserName>
+                  <UserName>{user.name}</UserName>
                 </User>
               </UserInfo>
-              <LogoutButton onPress={() => {}}>
+              <LogoutButton onPress={signOut}>
                 <PowerIcon name="power" />
               </LogoutButton>
             </UserWrapper>

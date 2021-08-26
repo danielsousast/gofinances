@@ -15,6 +15,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import { dataKey } from "../../utils/asyncstorage";
 import Header from "../../components/Header";
+import { useAuth } from "../../context/AuthContext";
 
 type TransactionType = "positive" | "negative";
 
@@ -32,6 +33,7 @@ const schema = Yup.object().shape({
 });
 
 const Register: React.FC = () => {
+  const { user } = useAuth();
   const [transactionType, setTransactionType] = useState("");
   const [categoryModalOpen, setCategoryModalOpen] = useState(false);
 
@@ -93,12 +95,15 @@ const Register: React.FC = () => {
     };
 
     try {
-      const response = await AsyncStorage.getItem(dataKey);
+      const response = await AsyncStorage.getItem(`${dataKey}:${user.email}`);
       const currentData = response ? JSON.parse(response) : [];
 
       const dataFormatted = [...currentData, newTransaction];
 
-      await AsyncStorage.setItem(dataKey, JSON.stringify(dataFormatted));
+      await AsyncStorage.setItem(
+        `${dataKey}:${user.email}`,
+        JSON.stringify(dataFormatted)
+      );
 
       resetFields();
 
