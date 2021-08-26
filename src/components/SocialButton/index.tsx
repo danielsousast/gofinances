@@ -14,7 +14,7 @@ const SocialButton: React.FC<ComponentProps> = ({
   ...rest
 }) => {
   return (
-    <Container>
+    <Container {...rest}>
       <ImageContainer>
         <Svg />
       </ImageContainer>
