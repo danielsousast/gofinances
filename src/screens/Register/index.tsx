@@ -151,11 +151,16 @@ const Register: React.FC = () => {
             <CategorySelectButton
               title={category.name}
               onPress={openSelectCategory}
+              testID="register:category-button"
             />
           </Fields>
           <Button title="Enviar" onPress={handleSubmit(handleRegister)} />
         </Form>
-        <Modal visible={categoryModalOpen} animationType="slide">
+        <Modal
+          visible={categoryModalOpen}
+          animationType="slide"
+          testID="register:modal-category"
+        >
           <CategorySelect
             category={category}
             setCategory={setCategory}
